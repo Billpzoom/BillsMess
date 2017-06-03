@@ -5,7 +5,7 @@ using Bill.Domain;
 
 namespace Bill.DataAccess
 {
-    public class Repository<T> where T : EntityInt32
+    public class Repository<T>:IRepository<T> where T : EntityInt32
     {
         protected readonly ISessionProvider SessionProvider;
 
@@ -20,14 +20,14 @@ namespace Bill.DataAccess
         ///     获得所有数据
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<T> GetAll()
+        public IList<T> GetAll()
         {
             var session = SessionProvider.GetCurrentSession();
             using (var tx = session.BeginTransaction())
             {
                 try
                 {
-                    IEnumerable<T> results = session.QueryOver<T>().List<T>();
+                    var results = session.QueryOver<T>().List<T>();
                     tx.Commit();
                     return results;
                 }
@@ -44,14 +44,14 @@ namespace Bill.DataAccess
         /// </summary>
         /// <param name="condition">条件</param>
         /// <returns></returns>
-        public IEnumerable<T> GetBy(Expression<Func<T, bool>> condition)
+        public IList<T> GetBy(Expression<Func<T, bool>> condition)
         {
             var session = SessionProvider.GetCurrentSession();
             using (var tx = session.BeginTransaction())
             {
                 try
                 {
-                    IEnumerable<T> results = session.QueryOver<T>().Where(condition).List();
+                    var results = session.QueryOver<T>().Where(condition).List();
                     tx.Commit();
                     return results;
                 }
