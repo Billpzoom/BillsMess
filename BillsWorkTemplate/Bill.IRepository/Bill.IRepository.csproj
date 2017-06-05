@@ -7,8 +7,8 @@
     <ProjectGuid>{DFC4A56B-DDB4-4168-8F0F-430E47234AFF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bill.IDataAccess</RootNamespace>
-    <AssemblyName>Bill.IDataAccess</AssemblyName>
+    <RootNamespace>Bill.IRepository</RootNamespace>
+    <AssemblyName>Bill.IRepository</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IRepository.cs" />
-    <Compile Include="IDomain1DataAccess.cs" />
+    <Compile Include="IDomain1Repository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

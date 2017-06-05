@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using Bill.Domain;
-using NHibernate;
 
 namespace Bill.Repository
 {
     public class Repository<T> where T : EntityInt32
     {
-        protected readonly ISession Session;
-        protected readonly IStatelessSession StatelessSession;
+        protected readonly ISessionProvider SessionProvider;
 
-        public Repository(ISession session)
+        public Repository(ISessionProvider sessionProvider)
         {
-            Session = session;
-        }
-
-        public Repository(IStatelessSession session)
-        {
-            StatelessSession = session;
+            SessionProvider = sessionProvider;
         }
 
         #region IRepository<T> 成员
@@ -29,17 +21,50 @@ namespace Bill.Repository
         /// <returns></returns>
         public IList<T> GetAll()
         {
-            return Session.QueryOver<T>().List<T>();
+            var session = SessionProvider.GetCurrentSession();
+            using (var tx = session.BeginTransaction())
+            {
+                try
+                {
+                    var results = session.QueryOver<T>().List<T>();
+                    tx.Commit();
+                    return results;
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
 
         /// <summary>
         ///     根据条件查询数据
         /// </summary>
-        /// <param name="condition">条件</param>
         /// <returns></returns>
-        public IList<T> GetBy(Expression<Func<T, bool>> condition)
+        /// <summary>
+        ///     新增数据
+        /// </summary>
+        /// <param name="entity"></param>
+        public int Add(T entity)
         {
-            return Session.QueryOver<T>().Where(condition).List();
+            if (entity == null)
+                return -1;
+            var session = SessionProvider.GetCurrentSession();
+            using (var tx = session.BeginTransaction())
+            {
+                try
+                {
+                    var id = (int) session.Save(entity);
+                    tx.Commit();
+                    return id;
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -48,7 +73,22 @@ namespace Bill.Repository
         /// <param name="entity"></param>
         public void Update(T entity)
         {
-            Session.Update(entity);
+            if (entity == null)
+                return;
+            var session = SessionProvider.GetCurrentSession();
+            using (var tx = session.BeginTransaction())
+            {
+                try
+                {
+                    session.Update(entity);
+                    tx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -59,7 +99,20 @@ namespace Bill.Repository
         {
             if (entity == null)
                 return;
-            Session.Delete(entity);
+            var session = SessionProvider.GetCurrentSession();
+            using (var tx = session.BeginTransaction())
+            {
+                try
+                {
+                    session.Delete(entity);
+                    tx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -68,8 +121,21 @@ namespace Bill.Repository
         /// <param name="entities"></param>
         public void BatchAdd(IEnumerable<T> entities)
         {
-            foreach (var t in entities)
-                StatelessSession.Insert(t);
+            var session = SessionProvider.GetCurrentStatelessSession();
+            using (var tx = session.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var t in entities)
+                        session.Insert(t);
+                    tx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -78,8 +144,21 @@ namespace Bill.Repository
         /// <param name="entities"></param>
         public void BatchUpdate(IEnumerable<T> entities)
         {
-            foreach (var t in entities)
-                StatelessSession.Update(t);
+            var session = SessionProvider.GetCurrentStatelessSession();
+            using (var tx = session.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var t in entities)
+                        session.Update(t);
+                    tx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -88,8 +167,21 @@ namespace Bill.Repository
         /// <param name="entities"></param>
         public void BatchDelete(IEnumerable<T> entities)
         {
-            foreach (var t in entities)
-                StatelessSession.Delete(t);
+            var session = SessionProvider.GetCurrentStatelessSession();
+            using (var tx = session.BeginTransaction())
+            {
+                try
+                {
+                    foreach (var t in entities)
+                        session.Delete(t);
+                    tx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -98,7 +190,20 @@ namespace Bill.Repository
         /// <param name="entity"></param>
         public void SaveOrUpdate(T entity)
         {
-            Session.SaveOrUpdate(entity);
+            var session = SessionProvider.GetCurrentSession();
+            using (var tx = session.BeginTransaction())
+            {
+                try
+                {
+                    session.SaveOrUpdate(entity);
+                    tx.Commit();
+                }
+                catch (Exception ex)
+                {
+                    tx.Rollback();
+                    throw new Exception(ex.Message);
+                }
+            }
         }
 
         /// <summary>
@@ -106,7 +211,8 @@ namespace Bill.Repository
         /// </summary>
         public void Flush()
         {
-            Session?.Flush();
+            var session = SessionProvider.GetCurrentSession();
+            session.Flush();
         }
 
         #endregion

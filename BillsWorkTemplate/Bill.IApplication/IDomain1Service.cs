@@ -5,6 +5,6 @@ namespace Bill.IApplication
 {
     public interface IDomain1Service
     {
-        List<Domain1> GetSomeDomain1S(int someId);
+        List<DomainOne> GetSomeDomain1S(int someId);
     }
 }

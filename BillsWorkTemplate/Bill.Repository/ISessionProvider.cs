@@ -1,8 +1,9 @@
-﻿using NHibernate;
+﻿using System;
+using NHibernate;
 
 namespace Bill.Repository
 {
-    public interface ISessionProvider
+    public interface ISessionProvider : IDisposable
     {
         ISession GetCurrentSession();
         IStatelessSession GetCurrentStatelessSession();

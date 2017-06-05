@@ -2,7 +2,7 @@
 
 namespace Bill.Repository
 {
-    public class SessionProvider
+    public class SessionProvider : ISessionProvider
     {
         private static IStatelessSession _currentStatelessSession;
         private readonly ISessionFactory _sessionFactory;
