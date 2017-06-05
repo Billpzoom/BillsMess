@@ -52,9 +52,9 @@
       <Project>{18eba0d0-6ce5-44d4-a36e-7c8234177ad0}</Project>
       <Name>Bill.IApplication</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bill.IDataAccess\Bill.IDataAccess.csproj">
+    <ProjectReference Include="..\Bill.IDataAccess\Bill.IRepository.csproj">
       <Project>{dfc4a56b-ddb4-4168-8f0f-430e47234aff}</Project>
-      <Name>Bill.IDataAccess</Name>
+      <Name>Bill.IRepository</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

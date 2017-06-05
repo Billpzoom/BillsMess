@@ -1,6 +1,6 @@
 ﻿using NHibernate;
 
-namespace Bill.DataAccess
+namespace Bill.Repository
 {
     public interface ISessionProvider
     {
