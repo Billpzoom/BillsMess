@@ -46,14 +46,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Domain1\DomainOne.cs" />
+    <Compile Include="Auth\Action.cs" />
+    <Compile Include="Auth\Role.cs" />
+    <Compile Include="Auth\User.cs" />
     <Compile Include="Entity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Value\Enums.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Domain2\" />
-    <Folder Include="Map\" />
-    <Folder Include="Value\" />
+    <Folder Include="other Domain\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -63,6 +64,15 @@
     <None Include="Schema\nhibernate-mapping.xsd">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Map\Action.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Map\Role.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Map\User.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

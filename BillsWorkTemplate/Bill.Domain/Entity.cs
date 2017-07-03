@@ -63,4 +63,9 @@ namespace Bill.Domain
 
     public class EntityInt32:Entity<int>
     { }
+
+    public class EntityUuidString : Entity<string>
+    {
+        
+    }
 }

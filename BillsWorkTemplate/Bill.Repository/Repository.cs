@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Bill.Domain;
+using Bill.IRepository;
+using NHibernate;
 
 namespace Bill.Repository
 {
-    public class Repository<T> where T : EntityInt32
+    public class Repository<T> : IRepository<T> where T : EntityUuidString
     {
-        protected readonly ISessionProvider SessionProvider;
+        protected readonly ISession Session;
 
-        public Repository(ISessionProvider sessionProvider)
+        public Repository(IUnitOfWork unitOfWork)
         {
-            SessionProvider = sessionProvider;
+            Session = ((UnitOfWork)unitOfWork).Session;
         }
 
         #region IRepository<T> 成员
@@ -21,21 +22,7 @@ namespace Bill.Repository
         /// <returns></returns>
         public IList<T> GetAll()
         {
-            var session = SessionProvider.GetCurrentSession();
-            using (var tx = session.BeginTransaction())
-            {
-                try
-                {
-                    var results = session.QueryOver<T>().List<T>();
-                    tx.Commit();
-                    return results;
-                }
-                catch (Exception ex)
-                {
-                    tx.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
+            return Session.QueryOver<T>().List<T>();
         }
 
         /// <summary>
@@ -50,21 +37,7 @@ namespace Bill.Repository
         {
             if (entity == null)
                 return -1;
-            var session = SessionProvider.GetCurrentSession();
-            using (var tx = session.BeginTransaction())
-            {
-                try
-                {
-                    var id = (int) session.Save(entity);
-                    tx.Commit();
-                    return id;
-                }
-                catch (Exception ex)
-                {
-                    tx.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
+            return (int) Session.Save(entity);
         }
 
         /// <summary>
@@ -75,20 +48,7 @@ namespace Bill.Repository
         {
             if (entity == null)
                 return;
-            var session = SessionProvider.GetCurrentSession();
-            using (var tx = session.BeginTransaction())
-            {
-                try
-                {
-                    session.Update(entity);
-                    tx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    tx.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
+            Session.Update(entity);
         }
 
         /// <summary>
@@ -99,89 +59,7 @@ namespace Bill.Repository
         {
             if (entity == null)
                 return;
-            var session = SessionProvider.GetCurrentSession();
-            using (var tx = session.BeginTransaction())
-            {
-                try
-                {
-                    session.Delete(entity);
-                    tx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    tx.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     批量添加数据
-        /// </summary>
-        /// <param name="entities"></param>
-        public void BatchAdd(IEnumerable<T> entities)
-        {
-            var session = SessionProvider.GetCurrentStatelessSession();
-            using (var tx = session.BeginTransaction())
-            {
-                try
-                {
-                    foreach (var t in entities)
-                        session.Insert(t);
-                    tx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    tx.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     批量更新数据
-        /// </summary>
-        /// <param name="entities"></param>
-        public void BatchUpdate(IEnumerable<T> entities)
-        {
-            var session = SessionProvider.GetCurrentStatelessSession();
-            using (var tx = session.BeginTransaction())
-            {
-                try
-                {
-                    foreach (var t in entities)
-                        session.Update(t);
-                    tx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    tx.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     批量删除数据
-        /// </summary>
-        /// <param name="entities"></param>
-        public void BatchDelete(IEnumerable<T> entities)
-        {
-            var session = SessionProvider.GetCurrentStatelessSession();
-            using (var tx = session.BeginTransaction())
-            {
-                try
-                {
-                    foreach (var t in entities)
-                        session.Delete(t);
-                    tx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    tx.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
+            Session.Delete(entity);
         }
 
         /// <summary>
@@ -190,20 +68,7 @@ namespace Bill.Repository
         /// <param name="entity"></param>
         public void SaveOrUpdate(T entity)
         {
-            var session = SessionProvider.GetCurrentSession();
-            using (var tx = session.BeginTransaction())
-            {
-                try
-                {
-                    session.SaveOrUpdate(entity);
-                    tx.Commit();
-                }
-                catch (Exception ex)
-                {
-                    tx.Rollback();
-                    throw new Exception(ex.Message);
-                }
-            }
+            Session.SaveOrUpdate(entity);
         }
 
         /// <summary>
@@ -211,8 +76,12 @@ namespace Bill.Repository
         /// </summary>
         public void Flush()
         {
-            var session = SessionProvider.GetCurrentSession();
-            session.Flush();
+            Session.Flush();
+        }
+
+        void IRepository<T>.Add(T entity)
+        {
+            Session.Save(entity);
         }
 
         #endregion
