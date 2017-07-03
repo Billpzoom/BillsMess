@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="Bill.Domain" namespace="Bill.Domain.Auth">
+  <class name="Role" table="BM_Role">
+    <id name="Id">
+      <generator class="uuid.string"/>
+    </id>
+    <version name="Version"/>
+    <property name="RoleName" type="string"/>
+    <bag name="Users" lazy="true" cascade="save-update" inverse="true">
+      <key column="RoleId"/>
+      <one-to-many class="User"/>
+    </bag>
+    <bag name="Actions" lazy="true" cascade="save-update" inverse="false" table="BM_Role_Action">
+      <key column="RoleId"/>
+      <many-to-many class="Action" column="ActionId"/>
+    </bag>
+  </class>
+</hibernate-mapping>
